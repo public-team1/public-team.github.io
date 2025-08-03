@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Emitra Bullet - Portal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
+    header, footer {
+      background-color: #2c3e50;
+      color: white;
+      text-align: center;
+      padding: 10px 0;
+    }
+    .container {
+      padding: 20px;
+    }
+    .section {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      padding: 20px;
+    }
+    .section h2 {
+      color: #2c3e50;
+    }
+    .tuition-box {
+      font-size: 18px;
+      color: #ff6600;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .btn {
+      background-color: #27ae60;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    input[type="number"] {
+      padding: 8px;
+      margin-right: 10px;
+      width: 120px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Emitra Bullet - User Dashboard</h1>
+  </header>
+
+  <div class="container">
+    <div class="section">
+      <h2>📋 User Profile</h2>
+      <p>Mobile Number: <input type="text" id="mobile" placeholder="Enter Mobile Number"></p>
+      <p>Address: <input type="text" placeholder="Enter Address"></p>
+      <p>Bank Name: <input type="text" placeholder="Enter Bank Name"></p>
+      <p>Account Number: <input type="text" placeholder="Enter Account Number"></p>
+      <p>IFSC Code: <input type="text" placeholder="Enter IFSC"></p>
+      <button class="btn">Submit KYC</button>
+    </div>
+
+    <div class="section">
+      <h2>💰 Deposit / Withdraw</h2>
+      <p>Current Balance: ₹<span id="balance">100</span></p>
+      <input type="number" id="amount" placeholder="Amount ₹">
+      <button class="btn" onclick="deposit()">Deposit</button>
+      <button class="btn" style="background-color:#c0392b;" onclick="withdraw()">Withdraw</button>
+      <div id="transaction-msg" style="margin-top:10px; color:blue;"></div>
+    </div>
+
+    <div class="section">
+      <h2>💸 Constitution Tuition Access</h2>
+      <p>Demo Tuition: <span style="color: green;">फ्री में उपलब्ध</span></p>
+      <div class="tuition-box" id="demo-tuition">📘 प्रस्तावना: 'हम भारत के लोग...' से संविधान की शुरुआत</div>
+      <br>
+      <p>Full Tuition Access: ₹50 पेमेंट करके देखें</p>
+      <p>Pay via UPI: <strong>7891805901@ptsbi</strong></p>
+      <button class="btn" onclick="unlockTuitions()">मैंने ₹50 का पेमेंट किया</button>
+      <div id="tuition-section" style="display:none; margin-top:15px;">
+        <h3>📚 आज की ट्यूशन:</h3>
+        <div class="tuition-box" id="paid-tuition"></div>
+        <button class="btn" onclick="attemptQuestion()">स्टार्ट करो (₹1 कटेगा)</button>
+        <div id="message" style="color:red; margin-top:10px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 Emitra Bullet | Powered by Kisu Singh Shilpkar</p>
+  </footer>
+
+  <script>
+    const tuitions = [
+      "🧠 अनुच्छेद 14: समानता का अधिकार | सभी नागरिकों को कानून के समक्ष समानता",
+      "📜 अनुच्छेद 21: जीवन और व्यक्तिगत स्वतंत्रता का अधिकार",
+      "🗳️ अनुच्छेद 324: चुनाव आयोग की शक्तियाँ",
+      "⚖️ अनुच्छेद 32: मौलिक अधिकारों की सुरक्षा हेतु सुप्रीम कोर्ट में याचिका",
+      "🛡️ अनुच्छेद 370: जम्मू-कश्मीर का विशेष दर्जा (अब हटा दिया गया)",
+    ];
+
+    let paid = false;
+    let balance = 100;
+
+    function updateBalanceDisplay() {
+      document.getElementById("balance").innerText = balance;
+    }
+
+    function deposit() {
+      let amt = parseFloat(document.getElementById("amount").value);
+      if (amt > 0) {
+        balance += amt;
+        updateBalanceDisplay();
+        document.getElementById("transaction-msg").innerText = `✅ ₹${amt} जमा किए गए।`;
+      } else {
+        document.getElementById("transaction-msg").innerText = "⚠️ सही राशि दर्ज करें।";
+      }
+    }
+
+    function withdraw() {
+      let amt = parseFloat(document.getElementById("amount").value);
+      if (amt > 0 && amt <= balance) {
+        balance -= amt;
+        updateBalanceDisplay();
+        document.getElementById("transaction-msg").innerText = `✅ ₹${amt} निकाले गए।`;
+      } else {
+        document.getElementById("transaction-msg").innerText = "❌ बैलेंस कम है या राशि गलत है।";
+      }
+    }
+
+    function unlockTuitions() {
+      if (balance >= 50) {
+        balance -= 50;
+        updateBalanceDisplay();
+        paid = true;
+        document.getElementById("tuition-section").style.display = "block";
+        updateTuition();
+        alert("✅ ₹50 चार्ज हुआ! अब ट्यूशन एक्सेस कर सकते हैं।");
+      } else {
+        alert("❌ ₹50 बैलेंस नहीं है, पहले जमा करें।");
+      }
+    }
+
+    function updateTuition() {
+      const hour = new Date().getHours();
+      const index = hour % tuitions.length;
+      document.getElementById("paid-tuition").innerText = tuitions[index];
+    }
+
+    function attemptQuestion() {
+      if (!paid) {
+        alert("⚠️ पहले ₹50 पेमेंट करें फिर ट्यूशन मिलेगी।");
+        return;
+      }
+      if (balance < 1) {
+        document.getElementById("message").innerText = "❌ बैलेंस नहीं है, ₹1 चार्ज नहीं हो सका।";
+        return;
+      }
+      balance -= 1;
+      updateBalanceDisplay();
+      document.getElementById("message").innerText = `✅ ₹1 चार्ज किया गया | शेष बैलेंस: ₹${balance}`;
+    }
+  </script>
+</body>
+</html>
